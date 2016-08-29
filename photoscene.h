@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsBlurEffect>
 
 #include <QString>
 #include <QStringList>
@@ -24,6 +25,7 @@ class PhotoScene : public QGraphicsScene
     Q_OBJECT
 public:
     PhotoScene();
+    void Init(void);
 
 public slots:
     void DrawScene(void);
@@ -44,6 +46,9 @@ private:
     QPixmap foreground;
     QPixmap background;
     QPoint foregroundOffset;
+
+    QGraphicsBlurEffect *foreBlur;
+    QGraphicsBlurEffect *backBlur;
 };
 
 #endif // PHOTOSCENE_H

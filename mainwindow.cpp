@@ -20,6 +20,7 @@ void MainWindow::init(void)
     gView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     pScene = new PhotoScene();
+    pScene->Init();
     gView->setScene(pScene);
 }
 
