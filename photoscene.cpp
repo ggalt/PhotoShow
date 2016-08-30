@@ -10,9 +10,6 @@ void PhotoScene::Init( void )
     connect(&t, SIGNAL(timeout()),
             this, SLOT(NextImage()));
 
-    foreBlur = new QGraphicsBlurEffect();
-    backBlur = new QGraphicsBlurEffect();
-
     NextImage();
     t.setInterval(5000);
     t.start();
@@ -23,10 +20,16 @@ void PhotoScene::DrawScene(void)
     this->clear();
     QGraphicsPixmapItem *backgroundImage = addPixmap(background);
     QGraphicsPixmapItem *foregroundImage = addPixmap(foreground);
+
+    QGraphicsBlurEffect *foreBlur;
+    QGraphicsBlurEffect *backBlur;
+    foreBlur = new QGraphicsBlurEffect();
+    backBlur = new QGraphicsBlurEffect();
+
     backBlur->setBlurRadius(100);
-//    foreBlur->setBlurRadius(0);
-//    backgroundImage->setGraphicsEffect(backBlur);
-//    foregroundImage->setGraphicsEffect(foreBlur);
+    foreBlur->setBlurRadius(0);
+    backgroundImage->setGraphicsEffect(backBlur);
+    foregroundImage->setGraphicsEffect(foreBlur);
     foregroundImage->setOffset(foregroundOffset);
 
     this->update();

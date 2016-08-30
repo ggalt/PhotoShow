@@ -46,9 +46,6 @@ private:
     QPixmap foreground;
     QPixmap background;
     QPoint foregroundOffset;
-
-    QGraphicsBlurEffect *foreBlur;
-    QGraphicsBlurEffect *backBlur;
 };
 
 #endif // PHOTOSCENE_H
