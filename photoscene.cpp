@@ -6,13 +6,35 @@ PhotoScene::PhotoScene()
 
 void PhotoScene::Init( void )
 {
+    blurState = BlurIn;
+    holdLength = 150;
+    holdCounter = 0;
+    foregroundBlur.setStartValue( 500 );
+    foregroundBlur.setEndValue(0);
+    foregroundBlur.setDuration(2000);
+    foregroundBlur.setEasingCurve(QEasingCurve::OutCubic);
+    foregroundBlur.setLoopCount(1);
+    backgroundBlur.setStartValue( 500 );
+    backgroundBlur.setEndValue(100);
+    backgroundBlur.setDuration(2000);
+    backgroundBlur.setEasingCurve(QEasingCurve::OutCubic);
+    backgroundBlur.setLoopCount(1);
+
+    blurJump = 50;
+
     ReadURLs();
-    connect(&t, SIGNAL(timeout()),
-            this, SLOT(NextImage()));
+//    connect(&displayTimer, SIGNAL(timeout()),
+//            this, SLOT(NextImage()));
+    connect(&animateTimer, SIGNAL(timeout()),
+            this, SLOT(AnimateBlur()));
 
     NextImage();
-    t.setInterval(5000);
-    t.start();
+    displayTimer.setInterval(5000);
+    animateTimer.setInterval(20);
+//    displayTimer.start();
+    foregroundBlur.start();
+    backgroundBlur.start();
+    animateTimer.start();
 }
 
 void PhotoScene::DrawScene(void)
@@ -26,15 +48,17 @@ void PhotoScene::DrawScene(void)
     foreBlur = new QGraphicsBlurEffect();
     backBlur = new QGraphicsBlurEffect();
 
-    backBlur->setBlurRadius(100);
-    foreBlur->setBlurRadius(0);
-    backgroundImage->setGraphicsEffect(backBlur);
-    foregroundImage->setGraphicsEffect(foreBlur);
-    foregroundImage->setOffset(foregroundOffset);
+    if( foreBlur != NULL && backBlur != NULL ){
+        foreBlur->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
+        backBlur->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
 
+        backBlur->setBlurRadius(backgroundBlur.currentValue().toInt());
+        foreBlur->setBlurRadius(foregroundBlur.currentValue().toInt());
+        backgroundImage->setGraphicsEffect(backBlur);
+        foregroundImage->setGraphicsEffect(foreBlur);
+        foregroundImage->setOffset(foregroundOffset);
+    }
     this->update();
-    qDebug() << "offset:" << foregroundOffset;
-    qDebug() << "foregroundImageSize:" << foreground.size();
 }
 
 void PhotoScene::NextImage(void)
@@ -52,13 +76,24 @@ void PhotoScene::NextImage(void)
     QPixmap p(QPixmap::fromImage(reader.read()));
     if(this->views().count() > 0) {
       scRect = this->views()[0]->geometry();
-//      this->setSceneRect(0,0,sceneWindow.width(), sceneWindow.height());
+      wideScreen = ( scRect.width() * 1000 ) / scRect.height();
     }
+    wideImage = ( p.width() * 1000 ) / p.height();
 
-    background = p.scaledToWidth(scRect.width());
-    foreground = p.scaledToHeight(scRect.height());
+    if( wideScreen > wideImage ) {
+        background = p.scaledToWidth(scRect.width());
+        foreground = p.scaledToHeight(scRect.height());
+    } else {
+        background = p.scaledToHeight(scRect.height());
+        foreground = p.scaledToWidth(scRect.width());
+    }
     foregroundOffset = QPoint((scRect.width() - foreground.width())/2, (scRect.height() - foreground.height())/2);
-    DrawScene();
+    blurState = BlurIn;
+
+//    foreBlur = new QGraphicsBlurEffect();
+//    backBlur = new QGraphicsBlurEffect();
+
+//    DrawScene();
 }
 
 QString PhotoScene::SelectImage(void)
@@ -86,4 +121,58 @@ void PhotoScene::ReadURLs(void)
     photoUrlList.append("C:/Users/ggalt66/Pictures/Desktop Images/DSC_0738");
 #endif
 
+}
+
+void PhotoScene::AnimateBlur( void )
+{
+    qDebug() << "animate" << foregroundBlur.currentLoopTime();
+    switch(blurState) {
+        case BlurIn:
+            if( foregroundBlur.currentValue().toInt() <= 0 ) {
+                animateTimer.stop();
+                blurState = BlurHold;
+                displayTimer.start();
+            }
+            break;
+
+        case BlurHold:
+            blurState = BlurOut;
+            displayTimer.stop();
+            foregroundBlur.setStartValue(0);
+            foregroundBlur.setEndValue(500);
+            foregroundBlur.setDuration(2000);
+            foregroundBlur.setEasingCurve(QEasingCurve::InCubic);
+            foregroundBlur.setLoopCount(1);
+            backgroundBlur.setStartValue(100);
+            backgroundBlur.setEndValue(500);
+            backgroundBlur.setDuration(2000);
+            backgroundBlur.setEasingCurve(QEasingCurve::InCubic);
+            backgroundBlur.setLoopCount(1);
+            foregroundBlur.start();
+            backgroundBlur.start();
+            animateTimer.start();
+        break;
+
+        case BlurOut:
+            if( foregroundBlur.currentValue().toInt() >= 500 ) {
+                NextImage();
+                blurState = BlurIn;
+                foregroundBlur.setStartValue( 500 );
+                foregroundBlur.setEndValue(0);
+                foregroundBlur.setDuration(2000);
+                foregroundBlur.setEasingCurve(QEasingCurve::OutCubic);
+                foregroundBlur.setLoopCount(1);
+                backgroundBlur.setStartValue( 500 );
+                backgroundBlur.setEndValue(100);
+                backgroundBlur.setDuration(2000);
+                backgroundBlur.setEasingCurve(QEasingCurve::OutCubic);
+                backgroundBlur.setLoopCount(1);
+                foregroundBlur.start();
+                backgroundBlur.start();
+            }
+
+        break;
+    }
+
+    DrawScene();
 }

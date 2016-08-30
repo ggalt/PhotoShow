@@ -17,8 +17,15 @@
 #include <QPoint>
 
 #include <QTimer>
+#include <QPropertyAnimation>
+#include <QEasingCurve>
 
 #include <QDebug>
+
+typedef enum {
+    BlurIn,
+    BlurHold,
+    BlurOut } BlurState;
 
 class PhotoScene : public QGraphicsScene
 {
@@ -32,6 +39,7 @@ public slots:
 
 private slots:
     void NextImage(void);
+    void AnimateBlur(void);
 
 private:
     void ReadURLs(void);
@@ -40,12 +48,26 @@ private:
 private:
     QStringList photoUrlList;
     int imageCount;
-    QTimer t;
+    QTimer displayTimer;
+    QTimer animateTimer;
 
     QRect scRect;
+    quint32 wideScreen;
+    quint32 wideImage;
     QPixmap foreground;
     QPixmap background;
     QPoint foregroundOffset;
+    QPropertyAnimation foregroundBlur;
+    QPropertyAnimation backgroundBlur;
+
+//    QGraphicsBlurEffect *foreBlur;
+//    QGraphicsBlurEffect *backBlur;
+
+
+    BlurState blurState;
+    int holdLength;
+    int holdCounter;
+    int blurJump;
 };
 
 #endif // PHOTOSCENE_H
