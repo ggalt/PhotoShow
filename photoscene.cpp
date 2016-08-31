@@ -7,26 +7,30 @@ PhotoScene::PhotoScene()
 void PhotoScene::Init( void )
 {
     blurState = BlurIn;
+    blurDuration = 2000;
+    blurOutVal = 300;
+    blurBackgroundVal = 75;
+
     holdLength = 150;
     holdCounter = 0;
     foregroundBlur = new QPropertyAnimation(&foreInt, "blurVal");
     backgroundBlur = new QPropertyAnimation(&backInt, "blurVal");
-    foregroundBlur->setStartValue( 500 );
+    foregroundBlur->setStartValue( blurOutVal );
     foregroundBlur->setEndValue(0);
-    foregroundBlur->setDuration(2000);
+    foregroundBlur->setDuration(blurDuration);
     foregroundBlur->setEasingCurve(QEasingCurve::OutCubic);
     foregroundBlur->setLoopCount(1);
-    backgroundBlur->setStartValue( 500 );
-    backgroundBlur->setEndValue(100);
-    backgroundBlur->setDuration(2000);
+    backgroundBlur->setStartValue( blurOutVal );
+    backgroundBlur->setEndValue(blurBackgroundVal);
+    backgroundBlur->setDuration(blurDuration);
     backgroundBlur->setEasingCurve(QEasingCurve::OutCubic);
     backgroundBlur->setLoopCount(1);
 
     blurJump = 50;
 
     ReadURLs();
-//    connect(&displayTimer, SIGNAL(timeout()),
-//            this, SLOT(NextImage()));
+    connect(&displayTimer, SIGNAL(timeout()),
+            this, SLOT(AnimateBlur()));
     connect(&animateTimer, SIGNAL(timeout()),
             this, SLOT(AnimateBlur()));
 
@@ -127,7 +131,7 @@ void PhotoScene::ReadURLs(void)
 
 void PhotoScene::AnimateBlur( void )
 {
-    qDebug() << "animate" << foregroundBlur->currentLoopTime();
+//    qDebug() << "animate" << foregroundBlur->currentValue().toInt();
     switch(blurState) {
         case BlurIn:
             if( foregroundBlur->currentValue().toInt() <= 0 ) {
@@ -138,16 +142,17 @@ void PhotoScene::AnimateBlur( void )
             break;
 
         case BlurHold:
+//            qDebug() << "holding";
             blurState = BlurOut;
             displayTimer.stop();
             foregroundBlur->setStartValue(0);
-            foregroundBlur->setEndValue(500);
-            foregroundBlur->setDuration(2000);
+            foregroundBlur->setEndValue(blurOutVal);
+            foregroundBlur->setDuration(blurDuration);
             foregroundBlur->setEasingCurve(QEasingCurve::InCubic);
             foregroundBlur->setLoopCount(1);
-            backgroundBlur->setStartValue(100);
-            backgroundBlur->setEndValue(500);
-            backgroundBlur->setDuration(2000);
+            backgroundBlur->setStartValue(blurBackgroundVal);
+            backgroundBlur->setEndValue(blurOutVal);
+            backgroundBlur->setDuration(blurDuration);
             backgroundBlur->setEasingCurve(QEasingCurve::InCubic);
             backgroundBlur->setLoopCount(1);
             foregroundBlur->start();
@@ -156,17 +161,17 @@ void PhotoScene::AnimateBlur( void )
         break;
 
         case BlurOut:
-            if( foregroundBlur->currentValue().toInt() >= 500 ) {
+            if( foregroundBlur->currentValue().toInt() >= blurOutVal ) {
                 NextImage();
                 blurState = BlurIn;
-                foregroundBlur->setStartValue( 500 );
+                foregroundBlur->setStartValue( blurOutVal );
                 foregroundBlur->setEndValue(0);
-                foregroundBlur->setDuration(2000);
+                foregroundBlur->setDuration(blurDuration);
                 foregroundBlur->setEasingCurve(QEasingCurve::OutCubic);
                 foregroundBlur->setLoopCount(1);
-                backgroundBlur->setStartValue( 500 );
-                backgroundBlur->setEndValue(100);
-                backgroundBlur->setDuration(2000);
+                backgroundBlur->setStartValue( blurOutVal );
+                backgroundBlur->setEndValue(blurBackgroundVal);
+                backgroundBlur->setDuration(blurDuration);
                 backgroundBlur->setEasingCurve(QEasingCurve::OutCubic);
                 backgroundBlur->setLoopCount(1);
                 foregroundBlur->start();

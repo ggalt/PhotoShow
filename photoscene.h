@@ -70,6 +70,9 @@ private:
 
 
     BlurState blurState;
+    int blurDuration;
+    int blurOutVal;
+    int blurBackgroundVal;
     int holdLength;
     int holdCounter;
     int blurJump;
