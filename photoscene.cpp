@@ -9,16 +9,18 @@ void PhotoScene::Init( void )
     blurState = BlurIn;
     holdLength = 150;
     holdCounter = 0;
-    foregroundBlur.setStartValue( 500 );
-    foregroundBlur.setEndValue(0);
-    foregroundBlur.setDuration(2000);
-    foregroundBlur.setEasingCurve(QEasingCurve::OutCubic);
-    foregroundBlur.setLoopCount(1);
-    backgroundBlur.setStartValue( 500 );
-    backgroundBlur.setEndValue(100);
-    backgroundBlur.setDuration(2000);
-    backgroundBlur.setEasingCurve(QEasingCurve::OutCubic);
-    backgroundBlur.setLoopCount(1);
+    foregroundBlur = new QPropertyAnimation(&foreInt, "blurVal");
+    backgroundBlur = new QPropertyAnimation(&backInt, "blurVal");
+    foregroundBlur->setStartValue( 500 );
+    foregroundBlur->setEndValue(0);
+    foregroundBlur->setDuration(2000);
+    foregroundBlur->setEasingCurve(QEasingCurve::OutCubic);
+    foregroundBlur->setLoopCount(1);
+    backgroundBlur->setStartValue( 500 );
+    backgroundBlur->setEndValue(100);
+    backgroundBlur->setDuration(2000);
+    backgroundBlur->setEasingCurve(QEasingCurve::OutCubic);
+    backgroundBlur->setLoopCount(1);
 
     blurJump = 50;
 
@@ -32,8 +34,8 @@ void PhotoScene::Init( void )
     displayTimer.setInterval(5000);
     animateTimer.setInterval(20);
 //    displayTimer.start();
-    foregroundBlur.start();
-    backgroundBlur.start();
+    foregroundBlur->start();
+    backgroundBlur->start();
     animateTimer.start();
 }
 
@@ -52,8 +54,8 @@ void PhotoScene::DrawScene(void)
         foreBlur->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
         backBlur->setBlurHints(QGraphicsBlurEffect::PerformanceHint);
 
-        backBlur->setBlurRadius(backgroundBlur.currentValue().toInt());
-        foreBlur->setBlurRadius(foregroundBlur.currentValue().toInt());
+        backBlur->setBlurRadius(backgroundBlur->currentValue().toInt());
+        foreBlur->setBlurRadius(foregroundBlur->currentValue().toInt());
         backgroundImage->setGraphicsEffect(backBlur);
         foregroundImage->setGraphicsEffect(foreBlur);
         foregroundImage->setOffset(foregroundOffset);
@@ -125,10 +127,10 @@ void PhotoScene::ReadURLs(void)
 
 void PhotoScene::AnimateBlur( void )
 {
-    qDebug() << "animate" << foregroundBlur.currentLoopTime();
+    qDebug() << "animate" << foregroundBlur->currentLoopTime();
     switch(blurState) {
         case BlurIn:
-            if( foregroundBlur.currentValue().toInt() <= 0 ) {
+            if( foregroundBlur->currentValue().toInt() <= 0 ) {
                 animateTimer.stop();
                 blurState = BlurHold;
                 displayTimer.start();
@@ -138,37 +140,37 @@ void PhotoScene::AnimateBlur( void )
         case BlurHold:
             blurState = BlurOut;
             displayTimer.stop();
-            foregroundBlur.setStartValue(0);
-            foregroundBlur.setEndValue(500);
-            foregroundBlur.setDuration(2000);
-            foregroundBlur.setEasingCurve(QEasingCurve::InCubic);
-            foregroundBlur.setLoopCount(1);
-            backgroundBlur.setStartValue(100);
-            backgroundBlur.setEndValue(500);
-            backgroundBlur.setDuration(2000);
-            backgroundBlur.setEasingCurve(QEasingCurve::InCubic);
-            backgroundBlur.setLoopCount(1);
-            foregroundBlur.start();
-            backgroundBlur.start();
+            foregroundBlur->setStartValue(0);
+            foregroundBlur->setEndValue(500);
+            foregroundBlur->setDuration(2000);
+            foregroundBlur->setEasingCurve(QEasingCurve::InCubic);
+            foregroundBlur->setLoopCount(1);
+            backgroundBlur->setStartValue(100);
+            backgroundBlur->setEndValue(500);
+            backgroundBlur->setDuration(2000);
+            backgroundBlur->setEasingCurve(QEasingCurve::InCubic);
+            backgroundBlur->setLoopCount(1);
+            foregroundBlur->start();
+            backgroundBlur->start();
             animateTimer.start();
         break;
 
         case BlurOut:
-            if( foregroundBlur.currentValue().toInt() >= 500 ) {
+            if( foregroundBlur->currentValue().toInt() >= 500 ) {
                 NextImage();
                 blurState = BlurIn;
-                foregroundBlur.setStartValue( 500 );
-                foregroundBlur.setEndValue(0);
-                foregroundBlur.setDuration(2000);
-                foregroundBlur.setEasingCurve(QEasingCurve::OutCubic);
-                foregroundBlur.setLoopCount(1);
-                backgroundBlur.setStartValue( 500 );
-                backgroundBlur.setEndValue(100);
-                backgroundBlur.setDuration(2000);
-                backgroundBlur.setEasingCurve(QEasingCurve::OutCubic);
-                backgroundBlur.setLoopCount(1);
-                foregroundBlur.start();
-                backgroundBlur.start();
+                foregroundBlur->setStartValue( 500 );
+                foregroundBlur->setEndValue(0);
+                foregroundBlur->setDuration(2000);
+                foregroundBlur->setEasingCurve(QEasingCurve::OutCubic);
+                foregroundBlur->setLoopCount(1);
+                backgroundBlur->setStartValue( 500 );
+                backgroundBlur->setEndValue(100);
+                backgroundBlur->setDuration(2000);
+                backgroundBlur->setEasingCurve(QEasingCurve::OutCubic);
+                backgroundBlur->setLoopCount(1);
+                foregroundBlur->start();
+                backgroundBlur->start();
             }
 
         break;

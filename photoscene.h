@@ -22,6 +22,8 @@
 
 #include <QDebug>
 
+#include "myintobject.h"
+
 typedef enum {
     BlurIn,
     BlurHold,
@@ -57,8 +59,11 @@ private:
     QPixmap foreground;
     QPixmap background;
     QPoint foregroundOffset;
-    QPropertyAnimation foregroundBlur;
-    QPropertyAnimation backgroundBlur;
+    QPropertyAnimation *foregroundBlur;
+    QPropertyAnimation *backgroundBlur;
+
+    myIntObject foreInt;
+    myIntObject backInt;
 
 //    QGraphicsBlurEffect *foreBlur;
 //    QGraphicsBlurEffect *backBlur;

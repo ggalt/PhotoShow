@@ -14,7 +14,9 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    photoscene.cpp
+    photoscene.cpp \
+    myintobject.cpp
 
 HEADERS  += mainwindow.h \
-    photoscene.h
+    photoscene.h \
+    myintobject.h
